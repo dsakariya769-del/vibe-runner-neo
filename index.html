@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>IMPOSSIBLE 100 // NEO</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="game-container">
+        <div id="start-screen" class="screen">
+            <h1 class="glitch-title">CORE // NEO</h1>
+            <p class="subtitle">SYSTEM VERSION 2030.1</p>
+            <button id="start-btn" class="modern-btn">INITIALIZE SYSTEM</button>
+        </div>
+
+        <div id="levels-screen" class="screen hidden">
+            <div class="header">
+                <h2>SELECT GRID LEVEL</h2>
+                <button id="back-to-menu" class="small-btn">BACK</button>
+            </div>
+            <div id="levels-grid"></div>
+        </div>
+
+        <div id="ui-layer" class="hidden">
+            <div class="hud-box">
+                <span class="label">SECTOR CODE</span>
+                <span id="levelCard" class="value">001</span>
+            </div>
+            <button id="exit-game-btn" class="small-btn">ABORT</button>
+        </div>
+
+        <canvas id="gameCanvas" class="hidden"></canvas>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
