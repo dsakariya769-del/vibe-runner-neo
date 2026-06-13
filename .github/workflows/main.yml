@@ -1,0 +1,96 @@
+name: Build Android APK and AAB
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. GitHub Repository se aapka code fetch karna
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # 2. Node.js environment initialize karna
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # 3. Java Environment setup karna (Android App banane ke liye zaroori hai)
+      - name: Setup Java JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      # 4. Web assets ko 'www' folder me copy karna
+      - name: Prepare Web Assets
+        run: |
+          mkdir -p www
+          cp index.html www/
+          cp style.css www/
+          cp script.js www/
+
+      # 5. Node package project setup karna
+      - name: Initialize NPM Package
+        run: npm init -y
+
+      # 6. Capacitor ki exact stable libraries install karna
+      - name: Install Capacitor Core & CLI
+        run: npm install @capacitor/core@6.0.0 @capacitor/cli@6.0.0 @capacitor/android@6.0.0
+
+      # 7. Capacitor Project Config file automatic create karna
+      - name: Create Capacitor Config
+        run: |
+          cat <<EOF > capacitor.config.json
+          {
+            "appId": "com.viberunner.neo",
+            "appName": "Vibe Runner Neo",
+            "webDir": "www",
+            "bundledWebRuntime": false
+          }
+          EOF
+
+      # 8. Android Native Platform Add karna
+      - name: Add Android Platform
+        run: npx cap add android
+
+      # 9. Web Assets ko Android project ke sath Sync karna
+      - name: Sync Web Assets to Android
+        run: npx cap sync android
+
+      # 10. Gradle tools ko file execute karne ki permission dena
+      - name: Set Gradle Permissions
+        run: |
+          cd android
+          chmod +x gradlew
+
+      # 11. Testing aur installation ke liye APK file compile karna
+      - name: Build Android APK
+        run: |
+          cd android
+          ./gradlew assembleDebug
+
+      # 12. Play Store par upload karne ke liye AAB file compile karna
+      - name: Build Android App Bundle (AAB)
+        run: |
+          cd android
+          ./gradlew bundleDebug
+
+      # 13. Tayyar APK ko GitHub Artifacts par upload karna
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Vibe-Runner-Neo-APK
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+
+      # 14. Tayyar AAB ko GitHub Artifacts par upload karna
+      - name: Upload AAB Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Vibe-Runner-Neo-AAB
+          path: android/app/build/outputs/bundle/debug/app-debug.aab
